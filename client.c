@@ -6,12 +6,9 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
 
 #define SERVER_PORT 34554
 #define BUFFER_SIZE 1024
-#define RED   "\x1B[31m"
-#define RESET "\x1B[0m"
 
 int main(int argc, char * argv[]) {
     if (argc < 2)
@@ -33,7 +30,8 @@ int main(int argc, char * argv[]) {
         printf("Cannot open socket.\n");
         exit(EXIT_FAILURE);
     }
-
+    
+    // socket address configuration
     struct sockaddr_in socket_address = {0};
     socket_address.sin_family = AF_INET;
     socket_address.sin_port = htons(SERVER_PORT);
@@ -43,13 +41,14 @@ int main(int argc, char * argv[]) {
                         (struct sockaddr *) &socket_address,        
                         sizeof(socket_address)))
     {
-        //printf("Cannot connect to the server.\n");  
-        fprintf(stderr, RED "ERROR %d " RESET "(%s:%d): %s\n", errno, __FILE__, __LINE__, strerror(errno));
+        printf("Cannot connect to the server.\n");  
         close(client_socket);
         exit(EXIT_FAILURE);
     }
     
-    if (send(client_socket, server_path, BUFFER_SIZE, 0) == -1) // sizeof(server_path)
+    // First message is the path for saving file on server side.
+    // All messages including the file name are the same size equal to the BUFFER_SIZE.
+    if (send(client_socket, server_path, BUFFER_SIZE, 0) == -1)
     {
         printf("Cannot send file path.\n");
         close(client_socket);
@@ -64,6 +63,8 @@ int main(int argc, char * argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    // Read bytes (size equal BUFFER_SIZE) from file to out_buffer,
+    // and then send them to the server.
     char out_buffer[BUFFER_SIZE] = {0};
     while (!feof(f))
     {
