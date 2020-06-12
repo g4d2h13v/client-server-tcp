@@ -72,12 +72,14 @@ int main(int argc, char * argv[]) {
         if (send(client_socket, out_buffer, BUFFER_SIZE, 0) == -1)
         {
             printf("Cannot send data.\n");
+            fclose(f);
             close(client_socket);
             exit(EXIT_FAILURE);
         }
         memset(out_buffer, 0, BUFFER_SIZE);
     }
     sleep(5);
+    fclose(f);
     close(client_socket);
     return 0;
 }
