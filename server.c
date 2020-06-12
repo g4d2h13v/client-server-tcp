@@ -30,7 +30,10 @@ int save_to_file(const char * file_name, char * datagram, size_t length)
         return -1;
     
     if (fwrite(datagram, 1, length, f) == 0)
+    {
+        fclose(f);
         return -1;
+    }
 
     fclose(f);
     return 0;
