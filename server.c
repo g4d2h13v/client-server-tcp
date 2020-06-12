@@ -16,24 +16,15 @@ IP сервера и путь на стороне сервера куда дол
 #include <fcntl.h>
 #include <unistd.h>
 
-// #define FTP_PORT 21
 #define SERVER_PORT 34554
 #define BUFFER_SIZE 1024
 #define BACKLOG_LENGTH 5
-
-// void print_error(const char * err)
-// {
-
-// }
-
-// char * get_path_from(char *)
 
 int save_to_file(const char * file_name, char * datagram, size_t length)
 {
     if (file_name == NULL || datagram == NULL || length == 0)
         return -1;
 
-    // char * file_path = get_path_from(datagram);
     FILE * f = fopen(file_name, "a");
     if (f == NULL)
         return -1;
@@ -45,22 +36,20 @@ int save_to_file(const char * file_name, char * datagram, size_t length)
     return 0;
 }
 
-int main(void) {
-    printf("Start.\n");
-    // main socket of server
+int main(void) {    
+    // main socket of the server
     int server_socket = socket(PF_INET, SOCK_STREAM, 0);
     if (server_socket == -1 )
     {
         printf("Cannot open socket.\n");
         exit(EXIT_FAILURE);
     }
-    //fcntl(server_socket, F_SETFL, O_NONBLOCK);
-    printf("Socket openned.\n");
+    
     // server address configuration
     struct sockaddr_in socket_address;
     memset(&socket_address, 0, sizeof(socket_address));
     socket_address.sin_family = AF_INET;
-    socket_address.sin_addr.s_addr  = inet_addr("127.0.0.1"); // htonl(INADDR_ANY);
+    socket_address.sin_addr.s_addr  = inet_addr("127.0.0.1");
     socket_address.sin_port = htons(SERVER_PORT);
 
     if (-1 == bind(server_socket, 
@@ -71,21 +60,20 @@ int main(void) {
         close(server_socket);
         exit(EXIT_FAILURE);
     }
-    printf("Socket binded.\n");
-    sleep(1);
+
+
     if (listen(server_socket, BACKLOG_LENGTH) == -1)
     {
         printf("Cannot start listening.\n");
         close(server_socket);
         exit(EXIT_FAILURE); 
     }
-    printf("Listening...\n");
+
     int filename_recv = 0;
     char filename[BUFFER_SIZE] = {0};
 
     while (1)
     {
-        printf("Waiting accept...\n");
         socklen_t address_len = sizeof(socket_address);
         int socket_descriptor = accept(server_socket, 
                                         (struct sockaddr *) &socket_address, 
@@ -97,7 +85,7 @@ int main(void) {
             close(server_socket);
             exit(EXIT_FAILURE);
         }
-        printf("Accepted\n");
+
         char in_buffer[BUFFER_SIZE] = {0};
         int recv_status = 0;
 
@@ -130,7 +118,6 @@ int main(void) {
             close(socket_descriptor); 
             filename_recv = 0;
         }
-        // if (sendmsg()) 
     }
     return 0;
 }
