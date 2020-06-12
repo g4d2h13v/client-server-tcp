@@ -14,6 +14,7 @@ IP сервера и путь на стороне сервера куда дол
 #include <arpa/inet.h>
 #include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 // #define FTP_PORT 21
 #define SERVER_PORT 34554
@@ -44,7 +45,7 @@ int save_to_file(const char * file_name, char * datagram, size_t length)
     return 0;
 }
 
-void main() {
+int main(void) {
     printf("Start.\n");
     // main socket of server
     int server_socket = socket(PF_INET, SOCK_STREAM, 0);
@@ -125,9 +126,11 @@ void main() {
         } 
         else 
         {
+            sleep(1);
             close(socket_descriptor); 
             filename_recv = 0;
         }
         // if (sendmsg()) 
     }
+    return 0;
 }
